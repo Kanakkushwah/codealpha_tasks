@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .filters {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .filters button {
+      margin: 5px;
+      padding: 8px 15px;
+      border: none;
+      cursor: pointer;
+      background: #333;
+      color: white;
+      border-radius: 20px;
+      transition: 0.3s;
+    }
+
+    .filters button:hover {
+      background: #f39c12;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s, filter 0.3s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+
+    .controls {
+      margin-top: 15px;
+    }
+
+    .controls button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      background: #f39c12;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    @media(max-width: 600px) {
+      .gallery img {
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Image Gallery</h1>
+
+<div class="filters">
+  <button onclick="filterImages('all')">All</button>
+  <button onclick="filterImages('nature')">Nature</button>
+  <button onclick="filterImages('animal')">Animal</button>
+</div>
+
+<div class="gallery" id="gallery">
+  <img src="https://img.freepik.com/free-photo/beautiful-lake-mountains_395237-44.jpg?semt=ais_hybrid&w=740&q=80" data-category="nature">
+  <img src="https://static.vecteezy.com/system/resources/thumbnails/049/855/347/small/nature-background-high-resolution-wallpaper-for-a-serene-and-stunning-view-photo.jpg" data-category="nature">
+  <img src="https://i.pinimg.com/736x/1a/cb/3b/1acb3b9ca320a54dcf55f6d666fc610c.jpg" data-category="nature">
+  <img  src="https://i.pinimg.com/236x/15/26/43/152643c9f0c08f7747cc0ac3afa8f138.jpg" 
+  data-category="nature">
+  <img src="https://images.unsplash.com/photo-1620053580376-3de604e91953?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" data-category="nature">
+  <img src="https://i.pinimg.com/236x/73/f7/ac/73f7acc0c8d638f57c691a110dc52141.jpg" data-category="nature">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2mulAbir4ixhKIerfx1MAPAiZhV8Jy5HY5Q&s" data-category="animal">
+  <img src="https://i.pinimg.com/736x/c2/26/2f/c2262fe2e60678fb14bc75673bd51338.jpg" data-category="animal">
+  <img src="https://i.pinimg.com/236x/77/a5/f4/77a5f484947133044b6654d3201e3671.jpg" data-category="animal">
+  <img src="https://i.pinimg.com/236x/cb/42/f8/cb42f8b9cfa5fea435b4cc4e35ad6cfb.jpg" data-category="animal">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScNYhm1bnWmP8Gkzzq63p5ewDB9UyeymmcgA&s" data-category="animal">
+  <img src="https://i.pinimg.com/236x/72/a2/8d/72a28dad15ce74ff691914cc3ecaad7e.jpg" data-category="animal">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiqNGzVFqkFZCIZcXqtXsVu4IrCYIO9_DE_g&s" data-category="animal">
+</div>
+
+<div class="lightbox" id="lightbox">
+  <img id="lightbox-img">
+  <div class="controls">
+    <button onclick="prevImage()">Prev</button>
+    <button onclick="nextImage()">Next</button>
+    <button onclick="closeLightbox()">Close</button>
+  </div>
+</div>
+
+<script>
+  const images = document.querySelectorAll('.gallery img');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+
+  let currentIndex = 0;
+  let visibleImages = Array.from(images);
+
+  images.forEach((img, index) => {
+    img.addEventListener('click', () => {
+      currentIndex = index;
+      showImage();
+      lightbox.style.display = 'flex';
+    });
+  });
+
+  function showImage() {
+    lightboxImg.src = visibleImages[currentIndex].src;
+  }
+
+  function nextImage() {
+    currentIndex = (currentIndex + 1) % visibleImages.length;
+    showImage();
+  }
+
+  function prevImage() {
+    currentIndex = (currentIndex - 1 + visibleImages.length) % visibleImages.length;
+    showImage();
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+  }
+
+  function filterImages(category) {
+    visibleImages = [];
+    images.forEach(img => {
+      if (category === 'all' || img.dataset.category === category) {
+        img.style.display = 'block';
+        visibleImages.push(img);
+      } else {
+        img.style.display = 'none';
+      }
+    });
+    currentIndex = 0;
+  }
+</script>
+
+</body>
+</html>
